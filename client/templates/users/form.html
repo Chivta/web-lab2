@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% if user %}Edit User{% else %}Create User{% endif %}</title>
+</head>
+<body>
+    <h1>{% if user %}Edit User{% else %}Create User{% endif %}</h1>
+    <form action="{{ form_action }}" method="post">
+        <label for="username">Username:</label><br>
+        <input type="text" id="username" name="username" value="{{ user.username if user }}" required><br>
+        <label for="email">Email:</label><br>
+        <input type="email" id="email" name="email" value="{{ user.email if user }}" required><br><br>
+        <input type="submit" value="{% if user %}Update{% else %}Create{% endif %} User">
+    </form>
+    <a href="{{ url_for('user.list_users') }}">Back to User List</a>
+</body>
+</html>

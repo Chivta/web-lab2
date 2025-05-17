@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Library Application</title>
+</head>
+<body>
+    <h1>Welcome to the Library Application!</h1>
+    <p>Manage books and users with ease.</p>
+    <ul>
+        <li><a href="{{ url_for('book.list_books') }}">View Books</a></li>
+        <li><a href="{{ url_for('user.list_users') }}">View Users</a></li>
+    </ul>
+</body>
+</html>

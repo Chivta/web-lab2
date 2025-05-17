@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% if book %}Edit Book{% else %}Create Book{% endif %}</title>
+</head>
+<body>
+    <h1>{% if book %}Edit Book{% else %}Create Book{% endif %}</h1>
+    <form action="{{ form_action }}" method="post">
+        <label for="title">Title:</label><br>
+        <input type="text" id="title" name="title" value="{{ book.title if book }}" required><br>
+        <label for="author">Author:</label><br>
+        <input type="text" id="author" name="author" value="{{ book.author if book }}" required><br>
+        <label for="publication_year">Publication Year:</label><br>
+        <input type="number" id="publication_year" name="publication_year" value="{{ book.publication_year if book }}"><br>
+        <label for="description">Description:</label><br>
+        <textarea id="description" name="description">{{ book.description if book }}</textarea><br><br>
+        <input type="submit" value="{% if book %}Update{% else %}Create{% endif %} Book">
+    </form>
+    <a href="{{ url_for('book.list_books') }}">Back to Book List</a>
+</body>
+</html>
