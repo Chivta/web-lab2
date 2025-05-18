@@ -1,46 +1,27 @@
-from datetime import datetime
-
 from flask import Blueprint, render_template, redirect, url_for, request, flash
-from server.models import db, Book, User, user_book_subscription
+from server.services.subscription_service import SubscriptionService
+from server.models import db, Book, User
 
 subscription_bp = Blueprint('subscription', __name__, url_prefix='/subscription')
+subscription_service = SubscriptionService()
 
 
 @subscription_bp.route('/')
 def list_subscriptions():
-    subscriptions = db.session.query(
-        User.username,
-        Book.title,
-        db.func.strftime('%Y-%m-%d %H:%M', user_book_subscription.c.date_added).label('date_added'),
-        User.id.label('User_id'),
-        Book.id.label('Book_id')
-    ).join(
-        user_book_subscription, User.id == user_book_subscription.c.user_id
-    ).join(
-        Book, Book.id == user_book_subscription.c.book_id
-    ).all()
+    subscriptions = subscription_service.get_all_subscriptions()
     return render_template('subscription/list.html', subscriptions=subscriptions)
 
-#
+
 @subscription_bp.route('/<int:user_id>/<int:book_id>')
 def view_subscription(user_id, book_id):
-    user = db.session.get(User, user_id)
-    book = db.session.get(Book, book_id)
+    subscription = subscription_service.get_subscription(user_id, book_id)
 
-    if not user:
-        flash('User not found!', 'danger')
-        return redirect(url_for('subscription.list_subscriptions'))  # Redirect to subscription list
-
-    if not book:
-        flash('Book not found!', 'danger')
-        return redirect(url_for('subscription.list_subscriptions'))  # Redirect to subscription list
-
-    subscription_exists = db.session.query(user_book_subscription).filter_by(user_id=user_id, book_id=book_id).first()
-
-    if not subscription_exists:
+    if not subscription:
         flash('Subscription not found!', 'danger')
         return redirect(url_for('subscription.list_subscriptions'))
 
+    user = db.session.get(User, user_id)  # Fetch user and book for display
+    book = db.session.get(Book, book_id)
     return render_template('subscription/view.html', user=user, book=book)
 
 
@@ -61,63 +42,40 @@ def create_subscription():
     if request.method == 'POST':
         user_id = request.form['user_id']
         book_id = request.form['book_id']
-        selected_user_id = int(user_id)  # Ensure integer for comparison
+        selected_user_id = int(user_id)
         selected_book_id = int(book_id)
 
-        user = db.session.get(User, user_id)
-        book = db.session.get(Book, book_id)
-
-        if not user:
-            errors['user_id'] = 'User not found!'
-        if not book:
-            errors['book_id'] = 'Book not found!'
-        subscription_exists = db.session.query(user_book_subscription).filter_by(user_id=user_id, book_id=book_id).first()
-        if subscription_exists:
-            errors['general'] = 'Subscription already exists!'
+        success, errors = subscription_service.create_subscription(user_id, book_id)
 
         if errors:
             return render_template('subscription/form.html', users=users, books=books,
                                    form_action=url_for('subscription.create_subscription'),
-                                   selected_user_id=selected_user_id, selected_book_id=selected_book_id, errors=errors)
+                                   selected_user_id=selected_user_id, selected_book_id=selected_book_id,
+                                   errors=errors)
 
-        new_subscription = user_book_subscription.insert().values(user_id=user_id, book_id=book_id,
-                                                                  date_added=datetime.now())
-        db.session.execute(new_subscription)
-        db.session.commit()
+        if success:
+            flash('Subscription created successfully!', 'success')
+            return redirect(url_for('subscription.list_subscriptions'))
+        else:
+            flash('Failed to create subscription!', 'danger')  # Generic error message
+            return render_template('subscription/form.html', users=users, books=books,
+                                   form_action=url_for('subscription.create_subscription'),
+                                   selected_user_id=selected_user_id, selected_book_id=selected_book_id,
+                                   errors=errors)
 
-        flash('Subscription created successfully!', 'success')
-        return redirect(url_for('subscription.list_subscriptions'))
-
-    # Якщо GET запит, відображаємо форму для створення підписки
     return render_template('subscription/form.html', users=users, books=books,
                            form_action=url_for('subscription.create_subscription'), errors=errors)
 
 
 @subscription_bp.route('/<int:user_id>/<int:book_id>/delete', methods=['POST'])
 def delete_subscription(user_id, book_id):
-    """Видалення підписки користувача на книгу."""
-    user = db.session.get(User, user_id)
-    book = db.session.get(Book, book_id)
+    success, errors = subscription_service.delete_subscription(user_id, book_id)
 
-    if not user:
-        flash('User not found!', 'danger')
-        return redirect(url_for('subscription.list_subscriptions'))
+    if errors:
+        flash(errors.get('general') or 'Failed to delete subscription!', 'danger')  # Use get() for safety
+    elif success:
+        flash('Subscription deleted successfully!', 'success')
+    else:
+        flash('Failed to delete subscription!', 'danger')  # Generic error
 
-    if not book:
-        flash('Book not found!', 'danger')
-        return redirect(url_for('subscription.list_subscriptions'))
-
-    # Перевіряємо, чи існує підписка
-    subscription = db.session.query(user_book_subscription).filter_by(user_id=user_id, book_id=book_id).first()
-    if not subscription:
-        flash('Subscription not found!', 'danger')
-        return redirect(url_for('subscription.list_subscriptions'))
-
-    # Видаляємо підписку
-    delete_stmt = user_book_subscription.delete().where(user_book_subscription.c.user_id == user_id).where(
-        user_book_subscription.c.book_id == book_id)
-    db.session.execute(delete_stmt)
-    db.session.commit()
-
-    flash('Subscription deleted successfully!', 'success')
     return redirect(url_for('subscription.list_subscriptions'))
