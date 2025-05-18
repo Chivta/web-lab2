@@ -70,7 +70,7 @@ This project is a web application built with Flask (Python) for managing library
 5.  **Run the application:**
 
     ```bash
-    flask --app server run --debug
+    flask run --debug
     ```
 
 6.  **Open your web browser and navigate to `http://127.0.0.1:5000/` (or the address specified by Flask).**
