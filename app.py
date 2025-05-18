@@ -18,6 +18,11 @@ def create_app():
     def index():
         return render_template('index.html')
 
+    @app.errorhandler(404)
+    def page_not_found(e):
+        return render_template('404.html')
+
+
     # Import and register blueprints (controllers) here
     from server.controllers import book_controller, user_controller, subscription_controller
     app.register_blueprint(book_controller.book_bp)
