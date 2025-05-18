@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+ <html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <title>User Book Subscriptions</title>
+ </head>
+ <body>
+  <a href="{{ url_for('index') }}">Go back</a>
+  <h1>User Book Subscriptions</h1>
+  <p><a href="{{ url_for('subscription.create_subscription') }}">Create New Subscription</a></p>
+  <table>
+   <thead>
+    <tr>
+     <th>Username</th>
+     <th>Book Title</th>
+     <th>Date Added</th>
+     <th>Actions</th>
+    </tr>
+   </thead>
+   <tbody>
+    {% for subscription in subscriptions %}
+    <tr>
+     <td>{{ subscription[0] }}</td>
+     <td>{{ subscription[1] }}</td>
+     <td>{{ subscription[2] }}</td>
+     <td>
+      <form action="{{ url_for('subscription.delete_subscription', user_id=subscription.User_id, book_id=subscription.Book_id) }}" method="post" style="display: inline;">
+       <button type="submit">Delete</button>
+      </form>
+     </td>
+    </tr>
+    {% endfor %}
+   </tbody>
+  </table>
+ </body>
+ </html>

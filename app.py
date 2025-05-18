@@ -1,6 +1,7 @@
 import os
 
 from flask import Flask, render_template
+
 from server.models import db
 
 def create_app():
@@ -18,9 +19,11 @@ def create_app():
         return render_template('index.html')
 
     # Import and register blueprints (controllers) here
-    from server.controllers import book_controller, user_controller
+    from server.controllers import book_controller, user_controller, subscription_controller
     app.register_blueprint(book_controller.book_bp)
     app.register_blueprint(user_controller.user_bp)
+    app.register_blueprint(subscription_controller.subscription_bp)
+
 
     return app
 
