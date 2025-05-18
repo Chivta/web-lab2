@@ -93,40 +93,6 @@ def create_subscription():
                            form_action=url_for('subscription.create_subscription'), errors=errors)
 
 
-# @subscription_bp.route('/<int:user_id>/<int:book_id>/update', methods=['GET', 'POST'])
-# def update_subscription(user_id, book_id):
-#     user = db.session.get(User, user_id)
-#     book = db.session.get(Book, book_id)
-#     if request.method == 'POST':
-#         if not user:
-#             flash('User not found!', 'danger')
-#             return redirect(url_for('subscription.list_subscriptions'))
-#
-#         if not book:
-#             flash('Book not found!', 'danger')
-#             return redirect(url_for('subscription.list_subscriptions'))
-#
-#         # Перевіряємо, чи існує підписка
-#         subscription = db.session.query(user_book_subscription).filter_by(user_id=user_id, book_id=book_id).first()
-#         if not subscription:
-#             flash('Subscription not found!', 'danger')
-#             return redirect(url_for('subscription.list_subscriptions'))
-#
-#         # if request.method == 'POST':
-#         # Отримуємо дані з форми (наприклад, нова дата)
-#         # new_date = request.form['new_date']
-#
-#         # Оновлюємо дані підписки (якщо є що оновлювати)
-#         # subscription.date = new_date
-#         db.session.commit()
-#         flash('Subscription updated successfully!', 'success')
-#         return redirect(url_for('subscription.view_subscription', user_id=user_id, book_id=book_id))
-#
-#     # Якщо GET запит, відображаємо форму для оновлення
-#     return render_template('subscription/form.html', user=user, book=book,
-#                            form_action=url_for('subscription.update_subscription', user_id=user_id, book_id=book_id))
-
-
 @subscription_bp.route('/<int:user_id>/<int:book_id>/delete', methods=['POST'])
 def delete_subscription(user_id, book_id):
     """Видалення підписки користувача на книгу."""
