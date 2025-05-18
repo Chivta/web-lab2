@@ -1,18 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>{% if user %}Edit User{% else %}Create User{% endif %}</title>
+ <meta charset="UTF-8">
+ <title>Create User</title>
+ <style>
+  .error-message {
+   color: red;
+   font-size: 0.8em;
+  }
+
+  input.error {
+   border-color: red;
+  }
+ </style>
 </head>
 <body>
-    <h1>{% if user %}Edit User{% else %}Create User{% endif %}</h1>
-    <form action="{{ form_action }}" method="post">
-        <label for="username">Username:</label><br>
-        <input type="text" id="username" name="username" value="{{ user.username if user }}" required><br>
-        <label for="email">Email:</label><br>
-        <input type="email" id="email" name="email" value="{{ user.email if user }}" required><br><br>
-        <input type="submit" value="{% if user %}Update{% else %}Create{% endif %} User">
-    </form>
-    <a href="{{ url_for('user.list_users') }}">Back to User List</a>
+ <a href="{{ url_for('user.list_users') }}">Back to User List</a>
+ <h1>Create New User</h1>
+
+ <form action="{{ form_action }}" method="post">
+  <label for="username">Username:</label><br>
+  <input type="text" id="username" name="username" value="{{ username or '' }}" {% if errors.username %}class="error"{% endif %} required><br>
+  {% if errors.username %}
+   <span class="error-message">{{ errors.username }}</span><br>
+  {% endif %}
+
+  <label for="email">Email:</label><br>
+  <input type="email" id="email" name="email" value="{{ email or '' }}" {% if errors.email %}class="error"{% endif %} required><br>
+  {% if errors.email %}
+   <span class="error-message">{{ errors.email }}</span><br>
+  {% endif %}
+
+  <input type="submit" value="Create User">
+ </form>
 </body>
 </html>

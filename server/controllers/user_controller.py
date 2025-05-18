@@ -25,13 +25,26 @@ def create_user():
         username = request.form['username']
         email = request.form['email']
 
+        errors = {}  # Словник для зберігання помилок
+
+        # Перевіряємо, чи існує вже користувач з таким ім'ям або email
+        existing_user = User.query.filter_by(username=username).first()
+        existing_email = User.query.filter_by(email=email).first()
+
+        if existing_user:
+            errors['username'] = 'Username already exists!'
+        if existing_email:
+            errors['email'] = 'Email already exists!'
+
+        if errors:
+            return render_template('users/form.html', form_action=url_for('user.create_user'), username=username, email=email, errors=errors)
+
         new_user = User(username=username, email=email)
         db.session.add(new_user)
         db.session.commit()
         flash('User created successfully!', 'success')
         return redirect(url_for('user.list_users'))
-    return render_template('users/form.html', form_action=url_for('user.create_user'))
-
+    return render_template('users/form.html', form_action=url_for('user.create_user'), errors={})
 
 @user_bp.route('/<int:user_id>/update', methods=['GET', 'POST'])
 def update_user(user_id):
