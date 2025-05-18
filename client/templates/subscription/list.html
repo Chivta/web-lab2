@@ -24,13 +24,22 @@
      <td>{{ subscription[1] }}</td>
      <td>{{ subscription[2] }}</td>
      <td>
-      <form action="{{ url_for('subscription.delete_subscription', user_id=subscription.User_id, book_id=subscription.Book_id) }}" method="post" style="display: inline;">
+      <form action="{{ url_for('subscription.delete_subscription', user_id=subscription.User_id, book_id=subscription.Book_id) }}" method="post" style="display: inline;" onsubmit="return confirmDelete('{{subscription[0]}}','{{subscription[1]}}')">
        <button type="submit">Delete</button>
       </form>
+
+
+
      </td>
     </tr>
     {% endfor %}
    </tbody>
   </table>
+
+           <script>
+               function confirmDelete(username, bookname) {
+  return confirm('Are you sure you want to delete "' + username + '" subscription on "' + bookname + '" book?');
+  }
+ </script>
  </body>
  </html>

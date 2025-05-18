@@ -29,7 +29,7 @@
   <td>
   <a href="{{ url_for('book.view_book', book_id=book.id) }}">View</a> |
   <a href="{{ url_for('book.update_book', book_id=book.id) }}">Edit</a> |
-  <form action="{{ url_for('book.delete_book', book_id=book.id) }}" method="post" style="display: inline;">
+  <form action="{{ url_for('book.delete_book', book_id=book.id) }}" method="post" style="display: inline;"  onsubmit="return confirmDelete('{{ book.title }}')">
   <button type="submit">Delete</button>
   </form>
   </td>
@@ -37,5 +37,12 @@
   {% endfor %}
  </tbody>
 </table>
+
+           <script>
+  function confirmDelete(bookname) {
+  return confirm('Are you sure you want to delete "' + bookname + '" book?');
+  }
+ </script>
+
 </body>
 </html>
