@@ -1,0 +1,32 @@
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  font-family: Arial, sans-serif;
+  color: #333;
+  box-shadow: 2px 2px 8px #ccc;
+  border-radius: 5px;
+  }
+
+
+th, td {
+border: 1px solid #ddd;
+padding: 8px;
+text-align: left;
+}
+
+
+th {
+background-color: #f2f2f2;
+}
+
+
+tr:nth-child(even) {
+background-color: #f9f9f9;
+}
+
+
+.description-cell {
+max-width: 200px;
+word-wrap: break-word;
+}
