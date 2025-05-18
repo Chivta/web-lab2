@@ -44,32 +44,44 @@ def view_subscription(user_id, book_id):
     return render_template('subscription/view.html', user=user, book=book)
 
 
+def get_subscription_form_data():
+    """Helper function to get data for the subscription form."""
+    users = db.session.execute(db.select(User)).scalars().all()
+    books = db.session.execute(db.select(Book)).scalars().all()
+    return users, books
+
+
 @subscription_bp.route('/create', methods=['GET', 'POST'])
 def create_subscription():
+    users, books = get_subscription_form_data()
+    errors = {}
+    selected_user_id = None
+    selected_book_id = None
+
     if request.method == 'POST':
         user_id = request.form['user_id']
         book_id = request.form['book_id']
+        selected_user_id = int(user_id)  # Ensure integer for comparison
+        selected_book_id = int(book_id)
 
         user = db.session.get(User, user_id)
         book = db.session.get(Book, book_id)
 
         if not user:
-            flash('User not found!', 'danger')
-            return redirect(url_for('subscription.list_subscriptions'))
-
+            errors['user_id'] = 'User not found!'
         if not book:
-            flash('Book not found!', 'danger')
-            return redirect(url_for('subscription.list_subscriptions'))
-
-        subscription_exists = db.session.query(user_book_subscription).filter_by(
-            user_id=user_id, book_id=book_id).first()
+            errors['book_id'] = 'Book not found!'
+        subscription_exists = db.session.query(user_book_subscription).filter_by(user_id=user_id, book_id=book_id).first()
         if subscription_exists:
-            flash('Subscription already exists!', 'warning')
-            return redirect(url_for('subscription.list_subscriptions'))
+            errors['general'] = 'Subscription already exists!'
 
-        new_subscription = user_book_subscription.insert().values(
-            user_id=user_id, book_id=book_id, date_added=datetime.now()
-        )
+        if errors:
+            return render_template('subscription/form.html', users=users, books=books,
+                                   form_action=url_for('subscription.create_subscription'),
+                                   selected_user_id=selected_user_id, selected_book_id=selected_book_id, errors=errors)
+
+        new_subscription = user_book_subscription.insert().values(user_id=user_id, book_id=book_id,
+                                                                  date_added=datetime.now())
         db.session.execute(new_subscription)
         db.session.commit()
 
@@ -77,12 +89,8 @@ def create_subscription():
         return redirect(url_for('subscription.list_subscriptions'))
 
     # Якщо GET запит, відображаємо форму для створення підписки
-    users = db.session.execute(db.select(User)).scalars().all()
-    books = db.session.execute(db.select(Book)).scalars().all()
-    return render_template('subscription/form.html',
-                           users=users,
-                           books=books,
-                           form_action=url_for('subscription.create_subscription'))
+    return render_template('subscription/form.html', users=users, books=books,
+                           form_action=url_for('subscription.create_subscription'), errors=errors)
 
 
 # @subscription_bp.route('/<int:user_id>/<int:book_id>/update', methods=['GET', 'POST'])

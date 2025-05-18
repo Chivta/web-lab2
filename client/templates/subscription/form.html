@@ -1,26 +1,41 @@
 <!DOCTYPE html>
- <html lang="en">
- <head>
-  <meta charset="UTF-8">
-  <title>{% if users and books %}Create Subscription{% else %}Create Subscription{% endif %}</title>
- </head>
- <body>
-  <h1>{% if users and books %}Create Subscription{% else %}Create Subscription{% endif %}</h1>
-  <form action="{{ form_action }}" method="post">
-  <label for="user_id">User:</label><br>
-  <select name="user_id" id="user_id" required>
-  {% for user in users %}
-  <option value="{{ user.id }}">{{ user.username }}</option>
-  {% endfor %}
-  </select><br><br>
-  <label for="book_id">Book:</label><br>
-  <select name="book_id" id="book_id" required>
-  {% for book in books %}
-  <option value="{{ book.id }}">{{ book.title }}</option>
-  {% endfor %}
-  </select><br><br>
-  <input type="submit" value="Create Subscription">
-  </form>
-  <a href="{{ url_for('subscription.list_subscriptions') }}">Back to Subscription List</a>
- </body>
- </html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <title>Create Subscription</title>
+ <style>
+ .error-message {
+ color: red;
+ font-size: 0.8em;
+ }
+ </style>
+</head>
+<body>
+ <a href="{{ url_for('subscription.list_subscriptions') }}">Back to Subscription List</a>
+ <h1>Create New Subscription</h1>
+ <form action="{{ form_action }}" method="post">
+ <label for="user_id">User:</label><br>
+ <select name="user_id" id="user_id" required>
+ {% for user in users %}
+ <option value="{{ user.id }}" {% if selected_user_id == user.id %}selected{% endif %}>{{ user.username }}</option>
+ {% endfor %}
+ </select><br>
+ {% if errors.user_id %}
+ <span class="error-message">{{ errors.user_id }}</span><br>
+ {% endif %}
+ <label for="book_id">Book:</label><br>
+ <select name="book_id" id="book_id" required>
+ {% for book in books %}
+ <option value="{{ book.id }}" {% if selected_book_id == book.id %}selected{% endif %}>{{ book.title }}</option>
+ {% endfor %}
+ </select><br>
+ {% if errors.book_id %}
+ <span class="error-message">{{ errors.book_id }}</span><br>
+ {% endif %}
+ {% if errors.general %}
+ <p class="error-message">{{ errors.general }}</p>
+ {% endif %}
+ <input type="submit" value="Create Subscription">
+ </form>
+</body>
+</html>
