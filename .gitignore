@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
+/instance
+*.egg-info
+
+# Database
+*.sqlite
+*.db
+*.bak
+
+# Flask
+/static/cache/* /static/uploads/*
+
+# IDEs and Editors
+.idea/
+.project
+.pydevproject.xml
+*.sublime-project
+*.sublime-workspace
+nbproject/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+
+# Logs
+*.log
+
+# Packages
+/dist/
+/build/
+/wheels/
+eggs/
+*.egg
+
+# Other
+/sessions
+/temp
+/tmp
+/out
