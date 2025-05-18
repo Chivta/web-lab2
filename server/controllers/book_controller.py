@@ -23,15 +23,23 @@ def create_book():
     if request.method == 'POST':
         title = request.form['title']
         author = request.form['author']
-        publication_year = request.form.get('publication_year', None)  # Use get() to avoid KeyError
+        publication_year = request.form.get('publication_year', None)
         description = request.form['description']
+
+        # Перевіряємо, чи існує вже книга з такою назвою та автором
+        existing_book = Book.query.filter_by(title=title, author=author).first()
+
+        if existing_book:
+            errors = {'title': 'A book with this title and author already exists!'}
+            return render_template('books/form.html', form_action=url_for('book.create_book'), title=title, author=author,
+                               publication_year=publication_year, description=description, errors=errors)
 
         new_book = Book(title=title, author=author, publication_year=publication_year, description=description)
         db.session.add(new_book)
         db.session.commit()
         flash('Book created successfully!', 'success')
         return redirect(url_for('book.list_books'))
-    return render_template('books/form.html', form_action=url_for('book.create_book'))
+    return render_template('books/form.html', form_action=url_for('book.create_book'),errors={})
 
 
 @book_bp.route('/<int:book_id>/update', methods=['GET', 'POST'])
